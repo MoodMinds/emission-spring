@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static org.moodminds.emission.Emittable.emittable;
 import static org.moodminds.reactive.FluxPublishable.flux;
@@ -24,7 +23,7 @@ import static reactor.core.publisher.Flux.from;
 @Configuration
 public class ReactiveAdapterRegistration implements InitializingBean {
 
-    private static final List<Consumer<ReactiveAdapterRegistry>> REGISTRARS = new LinkedList<>();
+    private static final List<Registrar> REGISTRARS = new LinkedList<>();
 
     static {
 
@@ -69,9 +68,23 @@ public class ReactiveAdapterRegistration implements InitializingBean {
         ReactiveAdapterRegistry sharedRegistry = getSharedInstance();
 
         REGISTRARS.forEach(registrar -> {
-            registrar.accept(sharedRegistry);
+            registrar.register(sharedRegistry);
             if (registry != null && registry != sharedRegistry)
-                registrar.accept(registry);
+                registrar.register(registry);
         });
+    }
+
+    /**
+     * Reactive Streams adapters registration function.
+     */
+    @FunctionalInterface
+    private interface Registrar {
+
+        /**
+         * Register reactive type(s) with the provided {@link ReactiveAdapterRegistry}.
+         *
+         * @param registry the provided {@link ReactiveAdapterRegistry}
+         */
+        void register(ReactiveAdapterRegistry registry);
     }
 }
