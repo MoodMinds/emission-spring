@@ -3,7 +3,6 @@ package org.springframework.core;
 import org.moodminds.emission.Emittable;
 import org.moodminds.reactive.Publishable;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.LinkedList;
@@ -54,7 +53,7 @@ public class ReactiveAdapterRegistration implements InitializingBean {
      *
      * @param registry the specified {@link ReactiveAdapterRegistry}
      */
-    public ReactiveAdapterRegistration(@Autowired(required = false) ReactiveAdapterRegistry registry) {
+    public ReactiveAdapterRegistration(ReactiveAdapterRegistry registry) {
         this.registry = registry;
     }
 
@@ -69,7 +68,7 @@ public class ReactiveAdapterRegistration implements InitializingBean {
 
         REGISTRARS.forEach(registrar -> {
             registrar.register(sharedRegistry);
-            if (registry != null && registry != sharedRegistry)
+            if (registry != sharedRegistry)
                 registrar.register(registry);
         });
     }
